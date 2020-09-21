@@ -1,4 +1,4 @@
-TARGET = shadertabler
+TARGET = shadetabler
 
 CC     = gcc
 CFLAGS = -Wall -Werror -O0 -Wno-unused-function

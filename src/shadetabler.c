@@ -10,7 +10,7 @@
 #include "exoquant/exoquant.h"
 #include "cwalk/cwalk.h"
 
-#define SHADETABLER_VERSION "1.0.0"
+#define SHADETABLER_VERSION "1.0.1"
 #define SHADETABLER_VERSION_DATE "2020-09-21"
 #define SHADETABLER_HEADER "Shadetabler (Shade Table Generator) by Todi / Tulou - version " SHADETABLER_VERSION " (" SHADETABLER_VERSION_DATE ")"
 
