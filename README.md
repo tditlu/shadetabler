@@ -35,3 +35,4 @@ ShadeTabler uses the following libraries:
 
 * [LodePNG](https://lodev.org/lodepng/) by Lode Vandevenne
 * [ExoQuant](https://github.com/exoticorn/exoquant/) by Dennis Ranke
+* [libcwalk](https://github.com/likle/cwalk/) by Leonard Iklé
