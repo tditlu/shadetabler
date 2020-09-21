@@ -15,7 +15,7 @@ image_error_t image_load_rgba(image_t *const image, const char *infile) {
 	image_error_t error;
 
 	unsigned int status = lodepng_decode32_file(&image->buffer, &image->width, &image->height, infile);
-    if (status || image->buffer == NULL) {
+	if (status || image->buffer == NULL) {
 		error = IMAGE_ERROR_OPEN;
 		goto error;
 	}
@@ -27,7 +27,7 @@ image_error_t image_load_rgba(image_t *const image, const char *infile) {
 				image->buffer[((y * image->width * 4) + (x * 4)) + 0] = (unsigned char)(((float)image->buffer[((y * image->width * 4) + (x * 4)) + 0]) * a);
 				image->buffer[((y * image->width * 4) + (x * 4)) + 1] = (unsigned char)(((float)image->buffer[((y * image->width * 4) + (x * 4)) + 1]) * a);
 				image->buffer[((y * image->width * 4) + (x * 4)) + 2] = (unsigned char)(((float)image->buffer[((y * image->width * 4) + (x * 4)) + 2]) * a);
-				image->buffer[((y * image->width * 4) + (x * 4)) + 2] = 255;
+				image->buffer[((y * image->width * 4) + (x * 4)) + 3] = 255;
 			}
 		}
 	}
