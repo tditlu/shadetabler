@@ -60,23 +60,23 @@ int main(int argc, char *argv[]) {
 		{0, 0, 0, 0}
 	};
 
-    const char *optstring = "o:vfc:s:t:frl:d:";
+	const char *optstring = "o:vfc:s:t:frl:d:";
 
 	if (argc <= 1) {
 		usage();
 		exit(EXIT_FAILURE);
 	}
 
-    char *output = NULL;
+	char *output = NULL;
 	unsigned int verbose = 0;
 	unsigned int force = 0;
-    unsigned int colors = 256;
-    unsigned int shades = 64;
-    unsigned int type = TYPE_LIGHT;
+	unsigned int colors = 256;
+	unsigned int shades = 64;
+	unsigned int type = TYPE_LIGHT;
 	unsigned int hq = 0;
-    unsigned int reserve = 0;
-    char *light_output = "shadetable_light.png";
-    char *dark_output = "shadetable_dark.png";
+	unsigned int reserve = 0;
+	char *light_output = "shadetable_light.png";
+	char *dark_output = "shadetable_dark.png";
 
 	int opt = 0;
 	while ((opt = getopt_long(argc, argv, optstring, longopts, 0)) != EOF) {
@@ -97,11 +97,11 @@ int main(int argc, char *argv[]) {
 				shades = atoi(optarg);
 				break;
 			case 't':
-                if (optarg[0] == 'd' || optarg[0] == 'D') {
-    				type = TYPE_DARK;
-                } else if (optarg[0] == 'b' || optarg[0] == 'B') {
-    				type = TYPE_BOTH;
-                }
+				if (optarg[0] == 'd' || optarg[0] == 'D') {
+					type = TYPE_DARK;
+				} else if (optarg[0] == 'b' || optarg[0] == 'B') {
+					type = TYPE_BOTH;
+				}
 				break;
 			case 'h':
 				hq = 0;
@@ -121,11 +121,11 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-    if (output == NULL) {
+	if (output == NULL) {
 		usage();
 		fprintf(stderr, "No output directory specified.\n\n");
 		exit(EXIT_FAILURE);
-    }
+	}
 
 	if ((argc - optind) == 0) {
 		usage();
@@ -133,95 +133,95 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-    if ((colors < 4 && reserve) || colors < 2 || colors > 256) {
+	if ((colors < 4 && reserve) || colors < 2 || colors > 256) {
 		usage();
-        fprintf(stderr, "Invalid number of colors%s.\n\n", reserve ? " (2 colors are reserved for black & white)." : "");
+		fprintf(stderr, "Invalid number of colors%s.\n\n", reserve ? " (2 colors are reserved for black & white)." : "");
 		exit(EXIT_FAILURE);
 	}
 
-    if (shades < 2 || shades > 256) {
+	if (shades < 2 || shades > 256) {
 		usage();
-        fprintf(stderr, "Invalid number of shades.\n\n");
+		fprintf(stderr, "Invalid number of shades.\n\n");
 		exit(EXIT_FAILURE);
 	}
 
-    if (verbose) {
-    	printf(SHADETABLER_HEADER "\n");
-    }
+	if (verbose) {
+		printf(SHADETABLER_HEADER "\n");
+	}
 
-    exq_data *exq = exq_init();
-    exq_no_transparency(exq);
+	exq_data *exq = exq_init();
+	exq_no_transparency(exq);
 
-    image_t *images = NULL;
-    unsigned char *palette = NULL;
-    char path[FILENAME_MAX];
+	image_t *images = NULL;
+	unsigned char *palette = NULL;
+	char path[FILENAME_MAX];
 
-    unsigned int number_of_images = (argc - optind);
-    images = calloc(number_of_images, sizeof(image_t));
-    if (images == NULL) {
-        fprintf(stderr, "Unable to allocate memory for images.\n");
-        goto error;
-    }
+	unsigned int number_of_images = (argc - optind);
+	images = calloc(number_of_images, sizeof(image_t));
+	if (images == NULL) {
+		fprintf(stderr, "Unable to allocate memory for images.\n");
+		goto error;
+	}
 
-    for (unsigned int i = 0; i < number_of_images; i++) {
-    	const char *infile = argv[optind + i];
-        if (cwk_path_normalize(infile, path, sizeof(path)) == 0)  {
-            fprintf(stderr, "Invalid input file path \"%s\".", infile);
-            goto error;
-        }
+	for (unsigned int i = 0; i < number_of_images; i++) {
+		const char *infile = argv[optind + i];
+		if (cwk_path_normalize(infile, path, sizeof(path)) == 0)  {
+			fprintf(stderr, "Invalid input file path \"%s\".", infile);
+			goto error;
+		}
 
-        const image_error_t image_error = image_load_rgba(&images[i], path);
-        if (image_error) {
-            fprintf(stderr, "Could not load input file \"%s\". %s.\n", path, image_error_text(image_error));
-            goto error;
-        }
+		const image_error_t image_error = image_load_rgba(&images[i], path);
+		if (image_error) {
+			fprintf(stderr, "Could not load input file \"%s\". %s.\n", path, image_error_text(image_error));
+			goto error;
+		}
 
-        if (verbose) {
-            printf("Generating shades for input file \"%s\".\n", path);
-        }
+		if (verbose) {
+			printf("Generating shades for input file \"%s\".\n", path);
+		}
 
-        unsigned char *buffer = images[i].buffer;
-        unsigned int width = images[i].width;
-        unsigned int height = images[i].height;
+		unsigned char *buffer = images[i].buffer;
+		unsigned int width = images[i].width;
+		unsigned int height = images[i].height;
 
-        if (type == TYPE_LIGHT || type == TYPE_BOTH) {
-            if (verbose) {
-                printf("Generating light shades for input file \"%s\".\n", path);
-            }
-            for (int j = 0; j < shades; j++) {
-                int shade = (int)floor((((float)j) / ((float)(shades - 1)) * 255.0f) + 0.5);
-                exq_feed_extened(exq, buffer, width * height, shade, reserve);
-            }
-        }
+		if (type == TYPE_LIGHT || type == TYPE_BOTH) {
+			if (verbose) {
+				printf("Generating light shades for input file \"%s\".\n", path);
+			}
+			for (int j = 0; j < shades; j++) {
+				int shade = (int)floor((((float)j) / ((float)(shades - 1)) * 255.0f) + 0.5);
+				exq_feed_extened(exq, buffer, width * height, shade, reserve);
+			}
+		}
 
-        if (type == TYPE_DARK || type == TYPE_BOTH) {
-            if (verbose) {
-                printf("Generating dark shades for input file \"%s\".\n", path);
-            }
-            for (int j = 0; j < shades; j++) {
-                int shade = ((int)floor((((float)j) / ((float)(shades - 1)) * 255.0f) + 0.5)) - 255;
-                exq_feed_extened(exq, buffer, width * height, shade, reserve);
-            }
-        }
-    }
+		if (type == TYPE_DARK || type == TYPE_BOTH) {
+			if (verbose) {
+				printf("Generating dark shades for input file \"%s\".\n", path);
+			}
+			for (int j = 0; j < shades; j++) {
+				int shade = ((int)floor((((float)j) / ((float)(shades - 1)) * 255.0f) + 0.5)) - 255;
+				exq_feed_extened(exq, buffer, width * height, shade, reserve);
+			}
+		}
+	}
 
-    if (verbose) {
-        printf("Quantizing images%s.\n", hq ? ", high quality" : "");
-    }
+	if (verbose) {
+		printf("Quantizing images%s.\n", hq ? ", high quality" : "");
+	}
 
-    exq_quantize_ex(exq, reserve ? colors - 2 : colors, hq);
+	exq_quantize_ex(exq, reserve ? colors - 2 : colors, hq);
 
-    palette = malloc(colors * 4 * sizeof(unsigned char));
-    if (palette == NULL) {
-        fprintf(stderr, "Unable to allocate memory for palette.\n");
-        goto error;
-    }
+	palette = malloc(colors * 4 * sizeof(unsigned char));
+	if (palette == NULL) {
+		fprintf(stderr, "Unable to allocate memory for palette.\n");
+		goto error;
+	}
 
-    if (verbose) {
-        printf("Generating & sorting palette.\n");
-    }
+	if (verbose) {
+		printf("Generating & sorting palette.\n");
+	}
 
-    exq_get_palette(exq, palette, reserve ? colors - 2 : colors);
+	exq_get_palette(exq, palette, reserve ? colors - 2 : colors);
 
 	if (reserve) {
 		palette[((colors - 2) * 4) + 0] = 0; // Force black
@@ -235,189 +235,189 @@ int main(int argc, char *argv[]) {
 		palette[((colors - 1) * 4) + 3] = 255;
 	}
 
-    qsort(palette, colors, sizeof(unsigned char) * 4, palette_qsort_compare); // Sort palette
+	qsort(palette, colors, sizeof(unsigned char) * 4, palette_qsort_compare); // Sort palette
 
-    exq_set_palette(exq, palette, colors);
+	exq_set_palette(exq, palette, colors);
 
-    for (unsigned int i = 0; i < number_of_images; i++) {
-    	const char *infile = argv[optind + i];
-        path_get_output_filename(path, sizeof(path), output, infile);
+	for (unsigned int i = 0; i < number_of_images; i++) {
+		const char *infile = argv[optind + i];
+		path_get_output_filename(path, sizeof(path), output, infile);
 
-        int write_image = 1;
-        if (!force && path_file_exists(path)) {
-            fprintf(stderr,"File '%s' already exists. Overwrite? [y/N] ", path);
-            fflush(stderr);
-            int c = getchar();
-            write_image = (c == 'y' || c == 'Y') ? 1 : 0;
-            while (c != '\n' && c != EOF) { c = getchar(); }
-        }
+		int write_image = 1;
+		if (!force && path_file_exists(path)) {
+			fprintf(stderr,"File '%s' already exists. Overwrite? [y/N] ", path);
+			fflush(stderr);
+			int c = getchar();
+			write_image = (c == 'y' || c == 'Y') ? 1 : 0;
+			while (c != '\n' && c != EOF) { c = getchar(); }
+		}
 
-        if (write_image) {
-            unsigned int width = images[i].width;
-            unsigned int height = images[i].height;
-            unsigned char *buffer = malloc(width * height * sizeof(unsigned char));
-            if (buffer == NULL) {
-                fprintf(stderr, "Unable to allocate memory for image \"%s\".\n", path);
-                goto error;
-            }
+		if (write_image) {
+			unsigned int width = images[i].width;
+			unsigned int height = images[i].height;
+			unsigned char *buffer = malloc(width * height * sizeof(unsigned char));
+			if (buffer == NULL) {
+				fprintf(stderr, "Unable to allocate memory for image \"%s\".\n", path);
+				goto error;
+			}
 
-            if (verbose) {
-                printf("Saving image \"%s\"\n", path);
-            }
+			if (verbose) {
+				printf("Saving image \"%s\"\n", path);
+			}
 
-            exq_map_image(exq, width * height, images[i].buffer, buffer);
-            save_image(path, buffer, width, height, palette, colors);
-            free(buffer);
-        } else {
-            if (verbose) {
-                printf("Skipping image \"%s\"\n", path);
-            }
-        }
-    }
+			exq_map_image(exq, width * height, images[i].buffer, buffer);
+			save_image(path, buffer, width, height, palette, colors);
+			free(buffer);
+		} else {
+			if (verbose) {
+				printf("Skipping image \"%s\"\n", path);
+			}
+		}
+	}
 
-    if (type == TYPE_LIGHT || type == TYPE_BOTH) {
-        path_get_output_filename(path, sizeof(path), output, light_output);
-        if (!allocate_generate_and_save_shadetable(exq, path, palette, colors, shades, 1, verbose, force)) {
-            goto error;
-        }
-    }
+	if (type == TYPE_LIGHT || type == TYPE_BOTH) {
+		path_get_output_filename(path, sizeof(path), output, light_output);
+		if (!allocate_generate_and_save_shadetable(exq, path, palette, colors, shades, 1, verbose, force)) {
+			goto error;
+		}
+	}
 
-    if (type == TYPE_DARK || type == TYPE_BOTH) {
-        path_get_output_filename(path, sizeof(path), output, dark_output);
-        if (!allocate_generate_and_save_shadetable(exq, path, palette, colors, shades, 0, verbose, force)) {
-            goto error;
-        }
-    }
+	if (type == TYPE_DARK || type == TYPE_BOTH) {
+		path_get_output_filename(path, sizeof(path), output, dark_output);
+		if (!allocate_generate_and_save_shadetable(exq, path, palette, colors, shades, 0, verbose, force)) {
+			goto error;
+		}
+	}
 
 error:
-    if (palette != NULL) {
-        free(palette);
-    }
+	if (palette != NULL) {
+		free(palette);
+	}
 
-    if (images != NULL) {
-        for (unsigned int i = 0; i < number_of_images; i++) {
-            image_free_rgba(&images[i]);
-        }
-        free(images);
-    }
+	if (images != NULL) {
+		for (unsigned int i = 0; i < number_of_images; i++) {
+			image_free_rgba(&images[i]);
+		}
+		free(images);
+	}
 
-    exq_free(exq);
+	exq_free(exq);
 }
 
 static int palette_qsort_compare(const void *a, const void *b) {
-    unsigned char ra = ((unsigned char *)a)[0];
-    unsigned char ga = ((unsigned char *)a)[1];
-    unsigned char ba = ((unsigned char *)a)[2];
+	unsigned char ra = ((unsigned char *)a)[0];
+	unsigned char ga = ((unsigned char *)a)[1];
+	unsigned char ba = ((unsigned char *)a)[2];
 
-    unsigned char rb = ((unsigned char *)b)[0];
-    unsigned char gb = ((unsigned char *)b)[1];
-    unsigned char bb = ((unsigned char *)b)[2];
+	unsigned char rb = ((unsigned char *)b)[0];
+	unsigned char gb = ((unsigned char *)b)[1];
+	unsigned char bb = ((unsigned char *)b)[2];
 
-    float af = (0.2126f * ((float)ra)) + (0.7152f * ((float)ga)) + (0.0722 * ((float)ba));
-    float bf = (0.2126f * ((float)rb)) + (0.7152f * ((float)gb)) + (0.0722 * ((float)bb));
+	float af = (0.2126f * ((float)ra)) + (0.7152f * ((float)ga)) + (0.0722 * ((float)ba));
+	float bf = (0.2126f * ((float)rb)) + (0.7152f * ((float)gb)) + (0.0722 * ((float)bb));
 
-    if (af > bf) {
-        return 1;
-    } else if (bf > af) {
-        return -1;
-    } else {
-        return 0;
-    }
+	if (af > bf) {
+		return 1;
+	} else if (bf > af) {
+		return -1;
+	} else {
+		return 0;
+	}
 }
 
 static unsigned char *allocate_and_generate_shadetable(unsigned char *palette, unsigned int colors, unsigned int shades, int light) {
-    unsigned char *buffer = malloc(colors * shades * 4 * sizeof(unsigned char));
-    if (buffer != NULL) {
-        for (unsigned int y = 0; y < shades; y++) {
-            int shade = (int)floor((((float)y) / ((float)(shades - 1)) * 255.0f) + 0.5);
-            if (!light) { shade = shade - 255; }
-            for (unsigned int x = 0; x < colors; x++) {
-                buffer[((y * colors * 4) + (x * 4)) + 0] = (unsigned char)CLAMP(((int)palette[(x * 4) + 0]) + shade, 0, 255);
-                buffer[((y * colors * 4) + (x * 4)) + 1] = (unsigned char)CLAMP(((int)palette[(x * 4) + 1]) + shade, 0, 255);
-                buffer[((y * colors * 4) + (x * 4)) + 2] = (unsigned char)CLAMP(((int)palette[(x * 4) + 2]) + shade, 0, 255);
-                buffer[((y * colors * 4) + (x * 4)) + 3] = 255;
-            }
-        }
-    }
-    return buffer;
+	unsigned char *buffer = malloc(colors * shades * 4 * sizeof(unsigned char));
+	if (buffer != NULL) {
+		for (unsigned int y = 0; y < shades; y++) {
+			int shade = (int)floor((((float)y) / ((float)(shades - 1)) * 255.0f) + 0.5);
+			if (!light) { shade = shade - 255; }
+			for (unsigned int x = 0; x < colors; x++) {
+				buffer[((y * colors * 4) + (x * 4)) + 0] = (unsigned char)CLAMP(((int)palette[(x * 4) + 0]) + shade, 0, 255);
+				buffer[((y * colors * 4) + (x * 4)) + 1] = (unsigned char)CLAMP(((int)palette[(x * 4) + 1]) + shade, 0, 255);
+				buffer[((y * colors * 4) + (x * 4)) + 2] = (unsigned char)CLAMP(((int)palette[(x * 4) + 2]) + shade, 0, 255);
+				buffer[((y * colors * 4) + (x * 4)) + 3] = 255;
+			}
+		}
+	}
+	return buffer;
 }
 
 static int allocate_generate_and_save_shadetable(exq_data *exq, char *path, unsigned char *palette, unsigned int colors, unsigned int shades, int light, int verbose, int force) {
-    int write_shadetable = 1;
-    if (!force && path_file_exists(path)) {
-        fprintf(stderr,"File '%s' already exists. Overwrite? [y/N] ", path);
-        fflush(stderr);
-        int c = getchar();
-        write_shadetable = (c == 'y' || c == 'Y') ? 1 : 0;
-        while (c != '\n' && c != EOF) { c = getchar(); }
-    }
+	int write_shadetable = 1;
+	if (!force && path_file_exists(path)) {
+		fprintf(stderr,"File '%s' already exists. Overwrite? [y/N] ", path);
+		fflush(stderr);
+		int c = getchar();
+		write_shadetable = (c == 'y' || c == 'Y') ? 1 : 0;
+		while (c != '\n' && c != EOF) { c = getchar(); }
+	}
 
-    if (write_shadetable) {
-        unsigned char *buffer_rgba = allocate_and_generate_shadetable(palette, colors, shades, light);
-        if (buffer_rgba != NULL) {
-            unsigned char *buffer_8bit = malloc(colors * shades * sizeof(unsigned char));
-            if (buffer_8bit != NULL) {
-                exq_map_image(exq, colors * shades, buffer_rgba, buffer_8bit);
+	if (write_shadetable) {
+		unsigned char *buffer_rgba = allocate_and_generate_shadetable(palette, colors, shades, light);
+		if (buffer_rgba != NULL) {
+			unsigned char *buffer_8bit = malloc(colors * shades * sizeof(unsigned char));
+			if (buffer_8bit != NULL) {
+				exq_map_image(exq, colors * shades, buffer_rgba, buffer_8bit);
 
-                if (verbose) {
-                    printf("Saving image \"%s\"\n", path);
-                }
+				if (verbose) {
+					printf("Saving image \"%s\"\n", path);
+				}
 
-                save_image(path, buffer_8bit, colors, shades, palette, colors);
-                free(buffer_8bit);
-            } else {
-                free(buffer_rgba);
-                fprintf(stderr, "Unable to allocate memory for shadetable.\n");
-                return 0;
-            }
-            free(buffer_rgba);
-        } else {
-            fprintf(stderr, "Unable to allocate memory for shadetable.\n");
-            return 0;
-        }
-    } else {
-        if (verbose) {
-            printf("Skipping image \"%s\"\n", path);
-        }
-    }
-    return 1;
+				save_image(path, buffer_8bit, colors, shades, palette, colors);
+				free(buffer_8bit);
+			} else {
+				free(buffer_rgba);
+				fprintf(stderr, "Unable to allocate memory for shadetable.\n");
+				return 0;
+			}
+			free(buffer_rgba);
+		} else {
+			fprintf(stderr, "Unable to allocate memory for shadetable.\n");
+			return 0;
+		}
+	} else {
+		if (verbose) {
+			printf("Skipping image \"%s\"\n", path);
+		}
+	}
+	return 1;
 }
 
 static void save_image(const char *filename, unsigned char *buffer, unsigned int width, unsigned int height, unsigned char *palette, unsigned int colors) {
-    LodePNGState state;
-    lodepng_state_init(&state);
-    state.info_raw.colortype = LCT_PALETTE;
-    state.info_raw.bitdepth = 8;
-    state.info_png.color.colortype = LCT_PALETTE;
-    state.info_png.color.bitdepth = 8;
+	LodePNGState state;
+	lodepng_state_init(&state);
+	state.info_raw.colortype = LCT_PALETTE;
+	state.info_raw.bitdepth = 8;
+	state.info_png.color.colortype = LCT_PALETTE;
+	state.info_png.color.bitdepth = 8;
 
 	state.encoder.filter_palette_zero = 0;
 	state.encoder.filter_strategy = LFS_ZERO;
 	state.encoder.auto_convert = 0;
 	state.encoder.force_palette = 1;
 
-    unsigned char *p = palette;
-    for (unsigned int i = 0; i < colors; i++) {
-        lodepng_palette_add(&state.info_png.color, p[0], p[1], p[2], p[3]);
-        lodepng_palette_add(&state.info_raw, p[0], p[1], p[2], p[3]);
-        p += 4;
-    }
+	unsigned char *p = palette;
+	for (unsigned int i = 0; i < colors; i++) {
+		lodepng_palette_add(&state.info_png.color, p[0], p[1], p[2], p[3]);
+		lodepng_palette_add(&state.info_raw, p[0], p[1], p[2], p[3]);
+		p += 4;
+	}
 
-    unsigned char *output_file_data;
-    size_t output_file_size;
-    unsigned int status = lodepng_encode(&output_file_data, &output_file_size, buffer, width, height, &state);
-    if (status) {
-        fprintf(stderr, "Can't encode image: %s\n", lodepng_error_text(status));
-        goto error;
-    }
+	unsigned char *output_file_data;
+	size_t output_file_size;
+	unsigned int status = lodepng_encode(&output_file_data, &output_file_size, buffer, width, height, &state);
+	if (status) {
+		fprintf(stderr, "Can't encode image: %s\n", lodepng_error_text(status));
+		goto error;
+	}
 
-    FILE *fp = fopen(filename, "wb");
-    if (!fp) {
-        fprintf(stderr, "Unable to write to %s\n", filename);
-        goto error;
-    }
-    fwrite(output_file_data, 1, output_file_size, fp);
-    fclose(fp);
+	FILE *fp = fopen(filename, "wb");
+	if (!fp) {
+		fprintf(stderr, "Unable to write to %s\n", filename);
+		goto error;
+	}
+	fwrite(output_file_data, 1, output_file_size, fp);
+	fclose(fp);
 
 error:
 	lodepng_state_cleanup(&state);
