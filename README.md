@@ -30,6 +30,19 @@ Examples:
 	shadetabler texture1.png texture2.png texture3.png -o ./shadetables
 	shadetabler -f -c 64 -s 32 -r -hq texture1.png -d shadetable.png -o ./shadetables
 
+## Example output
+Quantized image:
+
+![Quantized image](images/texture_quantized.png)
+
+Light shade table:
+
+![Shade table light](images/shadetable_light.png)
+
+Dark shade table:
+
+![Shade table dark](images/shadetable_dark.png)
+
 ## Acknowledgments
 ShadeTabler uses the following libraries:
 
