@@ -20,6 +20,7 @@ Available options are:
 	-s, --shades [2-256]            Number of shades in shade table. (Default 64)
 	-t, --type [light|dark|both]    Number of shades in shade table. (Default "light")
 	-h, --hq                        High quality quantization quality.
+	-p, --priority [0-...]          Priority of input file colors over generated shaded. (Default 0)
 	-r, --reserve                   Reserve colors for black and white.
 	-l, --light                     Light shade table filename. (Default "shadetable_light.png")
 	-d, --dark                      Dark shade table filename. (Default "shadetable_dark.png")

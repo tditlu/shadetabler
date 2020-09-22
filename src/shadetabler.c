@@ -10,8 +10,8 @@
 #include "exoquant/exoquant.h"
 #include "cwalk/cwalk.h"
 
-#define SHADETABLER_VERSION "1.0.3"
-#define SHADETABLER_VERSION_DATE "2020-09-21"
+#define SHADETABLER_VERSION "1.0.4"
+#define SHADETABLER_VERSION_DATE "2020-09-22"
 #define SHADETABLER_HEADER "ShadeTabler (Shade Table Generator) by Todi / Tulou - version " SHADETABLER_VERSION " (" SHADETABLER_VERSION_DATE ")"
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -35,6 +35,7 @@ static void usage() {
 	printf(" -t, --type [light|dark|both]    Number of shades in shade table. (Default \"light\")\n");
 	printf(" -h, --hq                        High quality quantization quality.\n");
 	printf(" -r, --reserve                   Reserve colors for black and white.\n");
+	printf(" -p, --priority [0-...]          Priority of input file colors over generated shaded. (Default 0)\n");
 	printf(" -l, --light                     Light shade table filename. (Default \"shadetable_light.png\")\n");
 	printf(" -d, --dark                      Dark shade table filename. (Default \"shadetable_dark.png\")\n");
 	printf("\n");
@@ -55,12 +56,13 @@ int main(int argc, char *argv[]) {
  		{"type", optional_argument, 0, 't' },
 		{"hq", no_argument, 0, 'h' },
 		{"reserve", no_argument, 0, 'r' },
+		{"priority", optional_argument, 0, 'p' },
 		{"light", optional_argument, 0, 'l' },
 		{"dark", optional_argument, 0, 'd' },
 		{0, 0, 0, 0}
 	};
 
-	const char *optstring = "o:vfc:s:t:hrl:d:";
+	const char *optstring = "o:vfc:s:t:hrp:l:d:";
 
 	if (argc <= 1) {
 		usage();
@@ -75,6 +77,7 @@ int main(int argc, char *argv[]) {
 	unsigned int type = TYPE_LIGHT;
 	unsigned int hq = 0;
 	unsigned int reserve = 0;
+	unsigned int priority = 0;
 	char *light_output = "shadetable_light.png";
 	char *dark_output = "shadetable_dark.png";
 
@@ -108,6 +111,9 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'r':
 				reserve = 1;
+				break;
+			case 'p':
+				priority = atoi(optarg);
 				break;
 			case 'l':
 				light_output = optarg;
@@ -176,19 +182,23 @@ int main(int argc, char *argv[]) {
 			goto error;
 		}
 
-		if (verbose) {
-			printf("Generating shades for input file \"%s\".\n", path);
-		}
-
 		unsigned char *buffer = images[i].buffer;
 		unsigned int width = images[i].width;
 		unsigned int height = images[i].height;
+
+		if (verbose) {
+			printf("Generating priority colors for input file \"%s\".\n", path);
+		}
+
+		for (int j = 0; j < priority; j++) {
+			exq_feed_extened(exq, buffer, width * height, 0, reserve);
+		}
 
 		if (type == TYPE_LIGHT || type == TYPE_BOTH) {
 			if (verbose) {
 				printf("Generating light shades for input file \"%s\".\n", path);
 			}
-			for (int j = 0; j < shades; j++) {
+			for (int j = 1; j < shades; j++) {
 				int shade = (int)floor((((float)j) / ((float)(shades - 1)) * 255.0f) + 0.5);
 				exq_feed_extened(exq, buffer, width * height, shade, reserve);
 			}
@@ -198,8 +208,8 @@ int main(int argc, char *argv[]) {
 			if (verbose) {
 				printf("Generating dark shades for input file \"%s\".\n", path);
 			}
-			for (int j = 0; j < shades; j++) {
-				int shade = ((int)floor((((float)j) / ((float)(shades - 1)) * 255.0f) + 0.5)) - 255;
+			for (int j = 0; j < (shades - 1); j++) {
+				int shade = ((int)floor((((float)j) / ((float)(shades - 1)) * 255.0f) - 0.5)) - 255;
 				exq_feed_extened(exq, buffer, width * height, shade, reserve);
 			}
 		}
