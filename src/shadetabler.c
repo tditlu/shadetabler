@@ -32,7 +32,7 @@ static void usage() {
 	printf(" -f, --force                     Overwrite existing files, never prompt.\n");
 	printf(" -c, --colors [2-256]            Number of colors saved in the output file. (Default 256)\n");
 	printf(" -s, --shades [2-256]            Number of shades in shade table. (Default 64)\n");
-	printf(" -t, --type [light|dark|both]    Number of shades in shade table. (Default \"light\")\n");
+	printf(" -t, --type [light|dark|both]    Type of shade table(s) to genereate. (Default \"light\")\n");
 	printf(" -h, --hq                        High quality quantization quality.\n");
 	printf(" -r, --reserve                   Reserve colors for black and white.\n");
 	printf(" -p, --priority [0-...]          Priority of input file colors over generated shaded. (Default 0)\n");
