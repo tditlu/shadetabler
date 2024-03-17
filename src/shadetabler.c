@@ -10,8 +10,8 @@
 #include "exoquant/exoquant.h"
 #include "cwalk/cwalk.h"
 
-#define SHADETABLER_VERSION "1.0.4"
-#define SHADETABLER_VERSION_DATE "2020-09-22"
+#define SHADETABLER_VERSION "1.0.5"
+#define SHADETABLER_VERSION_DATE "2024-03-17"
 #define SHADETABLER_HEADER "ShadeTabler (Shade Table Generator) by Todi / Tulou - version " SHADETABLER_VERSION " (" SHADETABLER_VERSION_DATE ")"
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
