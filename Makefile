@@ -1,7 +1,8 @@
-TARGET = shadetabler
+TARGET ?= shadetabler
 
 CC     = gcc
 CFLAGS = -Wall -Werror -O0 -Wno-unused-function
+LIBS   = -lm
 
 SRCDIR = src
 OBJDIR = obj
@@ -15,7 +16,7 @@ all: $(BINDIR)/$(TARGET)
 
 $(BINDIR)/$(TARGET): $(OBJECTS)
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $(OBJECTS) -o $@
+	@$(CC) $(CFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(INCLUDES)
 	@mkdir -p $(dir $@)
